@@ -31,19 +31,17 @@ io.on("connection", (socket) => {
 
 // Method to pass video url and resolution to downloadVideo function
 async function downloadVideo(res, url, socketId, formatType) {
-  // const videoPath = path.join(__dirname, 'video.mp4');
-  // const audioPath = path.join(__dirname, 'audio.mp3');
-  // const outputPath = path.join(__dirname, 'output.mp4');
-console.log(formatType)
+  console.log(formatType);
   const ytDownload = ytdl(url, {
-    
-    filter: (format) => {
-      if (formatType === "video") {
-        return format.hasVideo;
-      } else {
-        return format.hasAudio;
-      }
-    },
+    filter: "audioandvideo",
+
+    // filter: (format) => {
+    //   if (formatType === "video") {
+    //     return format.hasVideo;
+    //   } else {
+    //     return format.hasAudio;
+    //   }
+    // },
     quality: "highest",
     requestOptions: {
       headers: {
