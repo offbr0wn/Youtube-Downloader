@@ -7,7 +7,7 @@ const cors = require("cors");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const { format } = require("path");
-const s = "videos-downloader";
+const contentDisposition = require("content-disposition");
 
 const port = 3001;
 
@@ -17,7 +17,7 @@ app.use(cors());
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -30,10 +30,9 @@ io.on("connection", (socket) => {
 });
 
 // Method to pass video url and resolution to downloadVideo function
-async function downloadVideo(res, url, socketId, formatType) {
-  console.log(formatType);
+async function downloadVideo(res, url, socketId) {
   const ytDownload = ytdl(url, {
-    filter: "audioandvideo",
+    filter: (format) => format.hasAudio ,
 
     // filter: (format) => {
     //   if (formatType === "video") {
@@ -42,7 +41,7 @@ async function downloadVideo(res, url, socketId, formatType) {
     //     return format.hasAudio;
     //   }
     // },
-    quality: "highest",
+
     requestOptions: {
       headers: {
         "User-Agent":
@@ -51,14 +50,16 @@ async function downloadVideo(res, url, socketId, formatType) {
       },
     },
   });
-  ytDownload.pipe(res);
+  // ytDownload.on("progress", () => {});
 
-  ytDownload.on("progress", (_, downloaded, total) => {
-    const percent = (downloaded / total) * 100;
-    if (socketId) {
-      io.to(socketId).emit("progress", { percent });
-    }
-  });
+  ytDownload
+    .on("progress", (_, downloaded, total) => {
+      const percent = (downloaded / total) * 100;
+      if (socketId) {
+        io.to(socketId).emit("progress", { percent });
+      }
+    })
+    .pipe(res);
 
   ytDownload.on("end", () => {
     res.status(200).end();
@@ -109,13 +110,8 @@ function isValidYouTubeUrl(url) {
 
 // Path to post request to download video with resolution
 app.post("/download", async (req, res) => {
-  res.set(
-    "Content-Disposition",
-    `attachment; filename="video.mp4"`,
-    "Content-Type",
-    "video/mp4"
-  );
-  const { url, quality, socketId, formatType } = req.body;
+  res.setHeader("Content-Disposition", contentDisposition(`video.mp4`));
+  const { url, quality, socketId } = req.body;
 
   if (!url) {
     return res
@@ -128,7 +124,7 @@ app.post("/download", async (req, res) => {
   }
 
   try {
-    await downloadVideo(res, url, socketId, formatType);
+    await downloadVideo(res, url, socketId);
   } catch (error) {
     console.error("Failed to download video:", error);
     return res
