@@ -41,7 +41,7 @@ export function YtCardDownload({ result }) {
     const downloadData = {
       url: url,
       socketId: socket.id,
-      formatType:"video"
+      formatType: "video",
     };
     try {
       const res = await DownloadVideo(downloadData);
@@ -63,7 +63,7 @@ export function YtCardDownload({ result }) {
       console.log(error);
     }
   };
-
+console.log(value)
   return (
     <Card
       isBlurred
@@ -123,7 +123,7 @@ export function YtCardDownload({ result }) {
                 color="secondary"
                 size="lg"
                 onClick={downloadVideo}
-                isDisabled={value === 100}
+                isDisabled={value === 95}
               >
                 Download
               </Button>
