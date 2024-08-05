@@ -282,6 +282,10 @@ app.post("/video_info", async (req, res) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the YouTube Downloader API");
+});
+
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
