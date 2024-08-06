@@ -1,25 +1,24 @@
-import express, { json } from "express";
-import compression from 'compression';
-import bodyParser from "body-parser";
-import ytdl, { getInfo } from "@distube/ytdl-core";
-import { createReadStream, unlink } from "fs";
+const express = require("express");
+const compression = require('compression')
+const bodyParser = require("body-parser");
+const ytdl = require("@distube/ytdl-core");
+const fs = require("fs");
 const app = express();
-import cors from "cors";
-import { createServer } from "node:http";
-import { Server } from "socket.io";
-import helmet from "helmet";
-import compression from "compression";
-import { format } from "path";
-import contentDisposition from "content-disposition";
-import { setFfmpegPath } from "fluent-ffmpeg";
-import { spawn } from "child_process";
-import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
-setFfmpegPath(ffmpegPath);
+const cors = require("cors");
+const { createServer } = require("node:http");
+const { Server } = require("socket.io");
+const helmet = require("helmet");
+const { format } = require("path");
+const contentDisposition = require("content-disposition");
+const ffmpeg = require("fluent-ffmpeg");
+const cp = require("child_process");
+const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = 3001;
 
 // app.use(bodyParser.json());
-app.use(json());
+app.use(express.json());
 app.use(cors());
 app.use(helmet());
 app.use(compression());
@@ -83,7 +82,7 @@ async function downloadVideo(res, url, socketId) {
   //     io.to(socketId).emit("progress", { error: error.message });
   //   }
   // });
-  const info = await getInfo(url);
+  const info = await ytdl.getInfo(url);
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
   console.log("Duration:", duration);
   const videoStream = ytdl(url, { quality: "highestvideo" });
@@ -93,7 +92,7 @@ async function downloadVideo(res, url, socketId) {
   const outputFilePath = `temp_${Date.now()}.mp4`;
 
   // Spawn the FFmpeg process
-  const ffmpegProcess = spawn(
+  const ffmpegProcess = cp.spawn(
     ffmpegPath,
     [
       "-loglevel",
@@ -158,12 +157,12 @@ async function downloadVideo(res, url, socketId) {
   // Handle FFmpeg process close
   ffmpegProcess.on("close", () => {
     // Stream the temporary file to the response
-    const readStream = createReadStream(outputFilePath);
+    const readStream = fs.createReadStream(outputFilePath);
     readStream.pipe(res);
 
     // Delete the temporary file after streaming
     readStream.on("end", () => {
-      unlink(outputFilePath, (err) => {
+      fs.unlink(outputFilePath, (err) => {
         if (err) {
           console.error("Failed to delete temporary file:", err);
         } else {
@@ -207,7 +206,7 @@ async function downloadVideo(res, url, socketId) {
 // Method to get video information
 async function getVideoInfo(url) {
   try {
-    const info = await getInfo(url);
+    const info = await ytdl.getInfo(url);
 
     const videoThumbnail = info.videoDetails.thumbnails.filter(
       (item) => item.height === 1080
@@ -277,7 +276,7 @@ app.post("/video_info", async (req, res) => {
   const [videoInfo, errorMessage] = await getVideoInfo(url);
 
   if (videoInfo) {
-    const { formats } = await getInfo(url, {
+    const { formats } = await ytdl.getInfo(url, {
       quality: "highest",
     });
     // const filterFormat = formats.filter((item) => item.hasAudio && item.hasVideo);
