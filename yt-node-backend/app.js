@@ -13,6 +13,7 @@ const contentDisposition = require("content-disposition");
 const ffmpeg = require("fluent-ffmpeg");
 const cp = require("child_process");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+const { HttpsProxyAgent } = require("https-proxy-agent");
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
@@ -38,6 +39,9 @@ io.on("connection", (socket) => {
   });
 });
 
+const proxy = "http://165.225.198.124:8800";
+
+const agent = new HttpsProxyAgent(proxy);
 // Method to pass video url and resolution to downloadVideo function
 async function downloadVideo(res, url, socketId) {
   // const ytDownload = ytdl(url, {
@@ -83,11 +87,18 @@ async function downloadVideo(res, url, socketId) {
   //     io.to(socketId).emit("progress", { error: error.message });
   //   }
   // });
-  const info = await ytdl.getInfo(url);
+  const info = await ytdl.getInfo(url,{
+    requestOptions: { client: agent },});
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
-  const videoStream = ytdl(url, { quality: "highestvideo" });
-  const audioStream = ytdl(url, { quality: "highestaudio" });
+  const videoStream = ytdl(url, {
+    quality: "highestvideo",
+    requestOptions: { client: agent },
+  });
+  const audioStream = ytdl(url, {
+    quality: "highestaudio",
+    requestOptions: { client: agent },
+  });
 
   // Create a temporary output file path
   const outputFilePath = `temp_${Date.now()}.mp4`;

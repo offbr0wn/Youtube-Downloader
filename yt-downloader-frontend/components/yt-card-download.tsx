@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, CardBody, Image, Progress } from "@nextui-org/react";
 import moment from "moment";
 import { NextResponse } from "next/server";
-import { DownloadVideo } from "@/scripts/youtube-downloader";
+import { DownloadVideo, isProduction } from "@/scripts/youtube-downloader";
 import { io, Socket } from "socket.io-client";
 import DefaultEventsMap from "socket.io-client";
 
@@ -21,7 +21,7 @@ export function YtCardDownload({ result }: any) {
   > | null>(null);
   useEffect(() => {
     // Initialize the socket connection
-    const socketInstance = io(`${process.env.NEXT_PUBLIC_YT_API}`);
+    const socketInstance = io(`${isProduction}`);
 
     setSocket(socketInstance);
 
