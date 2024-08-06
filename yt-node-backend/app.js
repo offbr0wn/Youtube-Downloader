@@ -18,7 +18,7 @@ const { HttpsProxyAgent } = require("https-proxy-agent");
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = process.env.PORT || 3001;
-const proxy = "http://54.38.79.40:3128";
+const proxy = "http://165.225.198.124:8800";
 const agent = new HttpsProxyAgent(proxy);
 
 // app.use(bodyParser.json());
@@ -87,17 +87,17 @@ async function downloadVideo(res, url, socketId) {
   //   }
   // });
   const info = await ytdl.getInfo(url, {
-    // requestOptions: { agent },
+    requestOptions: { agent },
   });
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
   const videoStream = ytdl(url, {
     quality: "highestvideo",
-    // requestOptions: { agent },
+    requestOptions: { agent },
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
-    // requestOptions: { agent },
+    requestOptions: { agent },
   });
 
   // Create a temporary output file path
