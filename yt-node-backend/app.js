@@ -18,8 +18,8 @@ const { HttpsProxyAgent } = require("https-proxy-agent");
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = process.env.PORT || 3001;
-const agent = new HttpsProxyAgent(proxy);
 const proxy = "http://165.225.198.124:8800";
+const agent = new HttpsProxyAgent(proxy);
 
 // app.use(bodyParser.json());
 app.use(express.json());
