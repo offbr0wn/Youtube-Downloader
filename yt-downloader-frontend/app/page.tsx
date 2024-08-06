@@ -40,6 +40,7 @@ export default function Home() {
   const [result, setResult] = useState<VideoInfo | Error>();
 
   const hasError = result?.error;
+  // console.log("Tesiting", process.env.NEXT_PUBLIC_YT_API);
 
   const RenderCard = () => {
     if (result && !hasError) {

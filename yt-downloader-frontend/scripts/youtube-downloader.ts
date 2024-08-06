@@ -10,7 +10,7 @@ interface DownloadVideoProps {
 export async function YoutubeDownloader(downloadData: { url: string }) {
   const resBody = JSON.stringify(downloadData);
 
-  const res = await fetch("http://localhost:3001/video_info", {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_YT_API}/video_info`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
