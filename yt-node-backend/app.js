@@ -87,17 +87,17 @@ async function downloadVideo(res, url, socketId) {
   //   }
   // });
   const info = await ytdl.getInfo(url, {
-    requestOptions: { agent },
+    // requestOptions: { agent },
   });
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
   const videoStream = ytdl(url, {
     quality: "highestvideo",
-    requestOptions: { agent },
+    // requestOptions: { agent },
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
-    requestOptions: { agent },
+    // requestOptions: { agent },
   });
 
   // Create a temporary output file path
