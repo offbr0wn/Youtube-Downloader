@@ -6,14 +6,13 @@ interface DownloadVideoProps {
   url: string;
   socketId: string;
 }
-const isProduction =
-  process.env.NODE_ENV === "development"
+export const isProduction =
+  process.env.NODE_ENV === "production"
     ? process.env.NEXT_PUBLIC_YT_API
     : "http://localhost:3001";
 export async function YoutubeDownloader(downloadData: { url: string }) {
   const resBody = JSON.stringify(downloadData);
 
-  console.log("isProduction:", isProduction);
   const res = await fetch(`${isProduction}/video_info`, {
     method: "POST",
     headers: {
@@ -33,8 +32,8 @@ export async function DownloadVideo(downloadData: {
 }) {
   // console.log("Data:", JSON.stringify(downloadData));
   const resBody = JSON.stringify(downloadData);
-  console.log("resBody:", resBody);
-  const res = await fetch(`${process.env.NEXT_PUBLIC_YT_API}/download`, {
+
+  const res = await fetch(`${isProduction}/download`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
