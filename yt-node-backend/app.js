@@ -18,6 +18,8 @@ const { HttpsProxyAgent } = require("https-proxy-agent");
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = process.env.PORT || 3001;
+const agent = new HttpsProxyAgent(proxy);
+const proxy = "http://165.225.198.124:8800";
 
 // app.use(bodyParser.json());
 app.use(express.json());
@@ -39,9 +41,6 @@ io.on("connection", (socket) => {
   });
 });
 
-const proxy = "http://165.225.198.124:8800";
-
-const agent = new HttpsProxyAgent(proxy);
 // Method to pass video url and resolution to downloadVideo function
 async function downloadVideo(res, url, socketId) {
   // const ytDownload = ytdl(url, {
@@ -87,8 +86,9 @@ async function downloadVideo(res, url, socketId) {
   //     io.to(socketId).emit("progress", { error: error.message });
   //   }
   // });
-  const info = await ytdl.getInfo(url,{
-    requestOptions: { client: agent },});
+  const info = await ytdl.getInfo(url, {
+    requestOptions: { client: agent },
+  });
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
   const videoStream = ytdl(url, {
@@ -218,7 +218,7 @@ async function downloadVideo(res, url, socketId) {
 // Method to get video information
 async function getVideoInfo(url) {
   try {
-    const info = await ytdl.getInfo(url);
+    const info = await ytdl.getInfo(url, { requestOptions: { client: agent } });
 
     const videoThumbnail = info.videoDetails.thumbnails.filter(
       (item) => item.height === 1080
