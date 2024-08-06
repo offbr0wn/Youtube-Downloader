@@ -7,7 +7,7 @@ import { useDebounce } from "use-debounce";
 import DropdownComponent from "@/components/dropdown-component";
 import { YoutubeDownloader } from "@/scripts/youtube-downloader";
 
-export default function SearchComponent({ setResult }) {
+export default function SearchComponent({ setResult }:any) {
   const [text, setText] = useState("");
   const [value] = useDebounce(text, 10);
   const [socket, setSocket] = useState(null);

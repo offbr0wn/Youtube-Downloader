@@ -5,14 +5,24 @@ import { Button, Card, CardBody, Image, Progress } from "@nextui-org/react";
 import moment from "moment";
 import { NextResponse } from "next/server";
 import { DownloadVideo } from "@/scripts/youtube-downloader";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
+import DefaultEventsMap from "socket.io-client";
 
-export function YtCardDownload({ result }) {
+interface DownloadDataProps {
+  url: string;
+  socketId: string | number | undefined;
+  formatType: string;
+}
+export function YtCardDownload({ result }: any) {
   const [value, setValue] = useState(0);
-  const [socket, setSocket] = useState(null);
+  const [socket, setSocket] = useState<Socket<
+    typeof DefaultEventsMap,
+    typeof DefaultEventsMap
+  > | null>(null);
   useEffect(() => {
     // Initialize the socket connection
     const socketInstance = io("http://localhost:3001");
+
     setSocket(socketInstance);
 
     // Listen for progress events
@@ -35,10 +45,13 @@ export function YtCardDownload({ result }) {
   const downloadVideo = async () => {
     if (!socket || !socket.connected) {
       console.error("Socket is not initialized or connected");
-      return;
+      throw new Error("Invalid socket ID");
     }
+    // if (typeof socket.id !== "number") {
+    //   throw new Error("Invalid socket ID");
+    // }
 
-    const downloadData = {
+    const downloadData: DownloadDataProps = {
       url: url,
       socketId: socket.id,
       formatType: "video",
@@ -63,7 +76,7 @@ export function YtCardDownload({ result }) {
       console.log(error);
     }
   };
-console.log(value)
+
   return (
     <Card
       isBlurred
