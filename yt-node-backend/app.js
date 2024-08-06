@@ -15,7 +15,7 @@ const cp = require("child_process");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 80;
 
 // app.use(bodyParser.json());
 app.use(express.json());
