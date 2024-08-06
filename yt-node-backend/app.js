@@ -13,9 +13,10 @@ const contentDisposition = require("content-disposition");
 const ffmpeg = require("fluent-ffmpeg");
 const cp = require("child_process");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-const port = process.env.PORT || 80;
+const port = process.env.PORT || 3001;
 
 // app.use(bodyParser.json());
 app.use(express.json());
@@ -297,5 +298,9 @@ app.use((err, req, res, next) => {
 });
 
 server.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+
+app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
