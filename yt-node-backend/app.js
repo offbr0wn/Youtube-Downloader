@@ -20,7 +20,7 @@ const port = process.env.PORT || 3001;
 
 // app.use(bodyParser.json());
 app.use(express.json());
-app.use(cors(""));
+app.use(cors());
 app.use(helmet());
 app.use(compression());
 
@@ -85,7 +85,7 @@ async function downloadVideo(res, url, socketId) {
   // });
   const info = await ytdl.getInfo(url);
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
-  console.log("Duration:", duration);
+
   const videoStream = ytdl(url, { quality: "highestvideo" });
   const audioStream = ytdl(url, { quality: "highestaudio" });
 
@@ -300,7 +300,3 @@ app.use((err, req, res, next) => {
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-// app.listen(port, () => {
-//   console.log(`Server is running on port ${port}`);
-// });

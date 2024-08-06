@@ -21,7 +21,7 @@ export function YtCardDownload({ result }: any) {
   > | null>(null);
   useEffect(() => {
     // Initialize the socket connection
-    const socketInstance = io("http://localhost:3001");
+    const socketInstance = io(`${process.env.NEXT_PUBLIC_YT_API}`);
 
     setSocket(socketInstance);
 
