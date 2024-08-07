@@ -19,7 +19,8 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = process.env.PORT || 3001;
 const proxy = "http://165.225.198.124:8800";
-const agent = new HttpsProxyAgent(proxy);
+const agent = ytdl.createProxyAgent({ uri: proxy });
+// const agent = new HttpsProxyAgent(proxy);
 
 // app.use(bodyParser.json());
 app.use(express.json());
@@ -87,17 +88,17 @@ async function downloadVideo(res, url, socketId) {
   //   }
   // });
   const info = await ytdl.getInfo(url, {
-    requestOptions: { agent },
+    requestOptions: { client: agent },
   });
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
   const videoStream = ytdl(url, {
     quality: "highestvideo",
-    requestOptions: { agent },
+    requestOptions: { client: agent },
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
-    requestOptions: { agent },
+    requestOptions: { client: agent },
   });
 
   // Create a temporary output file path
