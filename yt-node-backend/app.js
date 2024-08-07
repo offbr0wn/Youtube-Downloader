@@ -218,7 +218,7 @@ async function downloadVideo(res, url, socketId) {
 // Method to get video information
 async function getVideoInfo(url) {
   try {
-    const info = await ytdl.getInfo(url, { requestOptions: { agent } });
+    const info = await ytdl.getInfo(url, { requestOptions: { client: agent } });
 
     const videoThumbnail = info.videoDetails.thumbnails.filter(
       (item) => item.height === 1080
