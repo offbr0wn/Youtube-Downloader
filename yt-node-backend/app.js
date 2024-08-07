@@ -19,7 +19,26 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = process.env.PORT || 3001;
 const proxy = "http://165.225.198.124:8800";
-const agent = ytdl.createProxyAgent({ uri: proxy });
+const cookieAgent = ytdl.createAgent([
+  {
+    domain: ".youtube.com",
+    expirationDate: 1738602823,
+    hostOnly: false,
+    httpOnly: true,
+    name: "LOGIN_INFO",
+    path: "/",
+    sameSite: "no_restriction",
+    secure: true,
+    session: false,
+    storeId: "0",
+    value:
+      "AFmmF2swRQIgWgUrGCQxUTkZJPYQNLheWaMNXh4dOvoCBwEHZWO__NECIQDze-eb8U1PD20r_i3QIcmBvlTg51PtRAzxRcez3EVYQQ:QUQ3MjNmd2hLVDJka0xIVzhlbjEwdlZNZnJrbXNhMTVpYmZsTHZaUU5rNGxRZUEyaHRfUU1mR2tNTEtzQlBvSUs1UnB6XzJ1TV9tb3ZYRVUtMU5yQmZaQllCc01nZ1BUZmI0MHZZd2g3bURkbmY0Ny1JZ1d1M2ZpclF5WDRjdm01aU9SeHU4QjJnR2U1aEtqcWRSc1kwRGkzZUpYSGI3NjlR",
+    id: 11,
+  },
+]);
+const agent = ytdl.createProxyAgent({ uri: proxy }, [
+  { name: "cookie", value: cookieAgent },
+]);
 // const agent = new HttpsProxyAgent(proxy);
 
 // app.use(bodyParser.json());
