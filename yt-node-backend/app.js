@@ -286,12 +286,8 @@ const cookies = cookiesArray.map((cookie) => ({
   value: cookie.value,
 }));
 
-const agentOptions = {
-  pipelining: 5,
-  maxRedirections: 0,
-  localAddress: "2a02:6b6f:e452:3100:8c52:1908:37a4:2275",
-};
-const agent = ytdl.createAgent(cookies, agentOptions);
+
+const agent = ytdl.createAgent(cookies);
 // const agent = ytdl.createAgent(cookies);
 // const agent = new HttpsProxyAgent(proxy);
 
