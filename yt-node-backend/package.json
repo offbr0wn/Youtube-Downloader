@@ -11,7 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@distube/ytdl-core": "^4.14.3",
+    "@distube/ytdl-core": "^4.14.4",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "compression": "^1.7.4",
     "content-disposition": "^0.5.4",
@@ -27,6 +27,7 @@
     "socket.io-client": "^4.7.5",
     "videos-downloader": "^1.0.2",
     "youtube-toolkit": "^1.0.5",
-    "ytdl": "^1.4.1"
+    "ytdl": "^1.4.1",
+    "ytdl-core": "^4.11.5"
   }
 }

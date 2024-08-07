@@ -19,7 +19,7 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = process.env.PORT || 3001;
 const proxy = "http://165.225.198.124:8800";
-const cookies = [
+const cookiesArray = [
   {
     domain: ".youtube.com",
     expirationDate: 1738600116,
@@ -281,6 +281,10 @@ const cookies = [
     id: 18,
   },
 ];
+const cookies = cookiesArray.map((cookie) => ({
+  name: cookie.name,
+  value: cookie.value,
+}));
 // const agent = ytdl.createProxyAgent({ uri: proxy }, cookies);
 const agent = ytdl.createAgent(cookies);
 // const agent = new HttpsProxyAgent(proxy);
@@ -351,17 +355,17 @@ async function downloadVideo(res, url, socketId) {
   //   }
   // });
   const info = await ytdl.getInfo(url, {
-    requestOptions: { client: agent },
+    agent: agent,
   });
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
   const videoStream = ytdl(url, {
     quality: "highestvideo",
-    requestOptions: { client: agent },
+    agent: agent,
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
-    requestOptions: { client: agent },
+    agent: agent,
   });
 
   // Create a temporary output file path
@@ -482,7 +486,7 @@ async function downloadVideo(res, url, socketId) {
 // Method to get video information
 async function getVideoInfo(url) {
   try {
-    const info = await ytdl.getInfo(url, { requestOptions: { client: agent } });
+    const info = await ytdl.getInfo(url, { agent: agent });
 
     const videoThumbnail = info.videoDetails.thumbnails.filter(
       (item) => item.height === 1080
