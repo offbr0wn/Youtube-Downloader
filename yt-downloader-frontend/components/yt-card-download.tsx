@@ -136,7 +136,8 @@ export function YtCardDownload({ result }: any) {
                 color="secondary"
                 size="lg"
                 onClick={downloadVideo}
-                isDisabled={value === 95}
+                disabled = {value == 95}
+                isDisabled = {value === 95}
               >
                 Download
               </Button>
