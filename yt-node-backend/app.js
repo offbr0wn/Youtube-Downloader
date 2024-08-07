@@ -18,7 +18,7 @@ const { HttpsProxyAgent } = require("https-proxy-agent");
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = process.env.PORT || 3001;
-const proxy = "http://165.225.198.124:8800";
+const proxy = "http://159.54.149.67:80";
 const cookiesArray = [
   {
     domain: ".youtube.com",
@@ -41,7 +41,7 @@ const cookiesArray = [
 //   value: cookie.value,
 // }));
 
-const agent = ytdl.createAgent(cookiesArray);
+const agent = ytdl.createProxyAgent({ uri: proxy }, cookiesArray);
 // const agent = ytdl.createAgent(cookies);
 // const agent = new HttpsProxyAgent(proxy);
 
