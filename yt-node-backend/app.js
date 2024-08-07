@@ -289,7 +289,7 @@ const cookies = cookiesArray.map((cookie) => ({
 const agentOptions = {
   pipelining: 5,
   maxRedirections: 0,
-  localAddress: "2a02:6b6f:e452:3100:f4ac:853f:245a:d4d5",
+  localAddress: "2a02:6b6f:e452:3100:8c52:1908:37a4:2275",
 };
 const agent = ytdl.createAgent(cookies, agentOptions);
 // const agent = ytdl.createAgent(cookies);
