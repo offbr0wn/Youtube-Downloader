@@ -41,8 +41,8 @@ const cookiesArray = [
 //   value: cookie.value,
 // }));
 
-const agent = ytdl.createProxyAgent({ uri: proxy }, cookiesArray);
-// const agent = ytdl.createAgent(cookies);
+// const agent = ytdl.createProxyAgent({ uri: proxy }, cookiesArray);
+const agent = ytdl.createAgent(cookiesArray);
 // const agent = new HttpsProxyAgent(proxy);
 
 // app.use(bodyParser.json());
@@ -112,16 +112,37 @@ async function downloadVideo(res, url, socketId) {
   // });
   const info = await ytdl.getInfo(url, {
     agent: agent,
+    requestOptions: {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+        "Accept-Language": "en-US,en;q=0.8",
+      },
+    },
   });
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
   const videoStream = ytdl(url, {
     quality: "highestvideo",
     agent: agent,
+    requestOptions: {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+        "Accept-Language": "en-US,en;q=0.8",
+      },
+    },
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
     agent: agent,
+    requestOptions: {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+        "Accept-Language": "en-US,en;q=0.8",
+      },
+    },
   });
 
   // Create a temporary output file path
@@ -242,7 +263,16 @@ async function downloadVideo(res, url, socketId) {
 // Method to get video information
 async function getVideoInfo(url) {
   try {
-    const info = await ytdl.getInfo(url, { agent: agent });
+    const info = await ytdl.getInfo(url, {
+      agent: agent,
+      requestOptions: {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+          "Accept-Language": "en-US,en;q=0.8",
+        },
+      },
+    });
 
     const videoThumbnail = info.videoDetails.thumbnails.filter(
       (item) => item.height === 1080
