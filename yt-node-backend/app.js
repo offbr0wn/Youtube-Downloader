@@ -112,7 +112,7 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
   });
 
   // Create a temporary output file path
-  const outputFilePath = `temp_${Date.now()}.mp4`;
+  const outputFilePath = `temp_${Date.now()}.${formatType}`;
 
   // Spawn the FFmpeg process
   const ffmpegProcess = cp.spawn(
@@ -231,14 +231,14 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
 async function downloadBasicWay(res, url, socketId, formatType, quality) {
   const info = await ytdl.getInfo(url, { agent: agent });
   const bestFormat = ytdl.chooseFormat(info.formats, {
-    quality: formatType === "mp3" ? "highestaudio" : "highest",
+    quality: "highest",
     filter: (format) => {
       if (formatType === "mp3") {
         return format?.hasAudio && !format.hasVideo;
       }
-      return (
-        format?.container === formatType && format.qualityLabel === quality
-      );
+      // return (
+      //   format?.container === formatType && format.qualityLabel === quality
+      // );
     },
   });
 
