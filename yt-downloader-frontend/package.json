@@ -1,12 +1,12 @@
 {
 	"name": "next-app-template",
 	"version": "0.0.1",
-	"private": true,
+	"private": false,
 	"scripts": {
 		"dev": "next dev --turbo",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
+		"lint": "next lint"
 	},
 	"dependencies": {
 		"@nextui-org/button": "2.0.34",
