@@ -5,7 +5,6 @@ const path = require("path");
 const fs = require("fs");
 const app = express();
 const cors = require("cors");
-// const { createServer } = require("node:http");
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
@@ -14,12 +13,12 @@ const contentDisposition = require("content-disposition");
 const ffmpeg = require("fluent-ffmpeg");
 const cp = require("child_process");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
-const { HttpsProxyAgent } = require("https-proxy-agent");
+require("dotenv").config();
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = process.env.PORT || 3001;
-const proxy = "http://152.26.229.42:9443";
+const proxy = process.env.PROXY_IP;
 const cookiesArray = [
   {
     domain: ".youtube.com",
@@ -215,9 +214,6 @@ async function downloadBasicWay(res, url, socketId, formatType, quality) {
       if (formatType === "mp3") {
         return format?.mimeType?.match(/audio/);
       }
-      // return (
-      //   format?.container === formatType && format.qualityLabel === quality
-      // );
     },
   });
 
@@ -328,8 +324,11 @@ function isValidYouTubeUrl(url) {
 
 // Path to post request to download video with resolution
 app.post("/download", async (req, res) => {
-  res.setHeader("Content-Disposition", contentDisposition(`video.mp4`));
   const { url, quality, socketId, formatType } = req.body;
+  res.setHeader(
+    "Content-Disposition",
+    contentDisposition(`video.${formatType}`)
+  );
 
   if (!url) {
     return res
