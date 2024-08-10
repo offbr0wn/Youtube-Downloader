@@ -20,7 +20,6 @@ export async function GetVideoInfo(downloadData: { url: string }) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-    
     },
     body: resBody,
   });
@@ -41,7 +40,6 @@ export async function DownloadVideo(downloadData: {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      " Access-Control-Allow-Origin": "*",
     },
     body: resBody,
   });
