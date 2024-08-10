@@ -52,7 +52,7 @@ export default function Home() {
     } else {
       return (
         <h1 className="text-center text-4xl text-default-600 font-bold ">
-          {result?.error}
+          {result?.error}, Please Select a different resolution 
         </h1>
       );
     }

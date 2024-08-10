@@ -7,10 +7,10 @@ interface DownloadVideoProps {
   socketId: string;
 }
 export const isProduction =
-  process.env.NODE_ENV === "development"
+  process.env.NODE_ENV === "production"
     ? process.env.NEXT_PUBLIC_YT_API
     : "http://localhost:3001";
-export async function YoutubeDownloader(downloadData: { url: string }) {
+export async function GetVideoInfo(downloadData: { url: string }) {
   const resBody = JSON.stringify(downloadData);
 
   const res = await fetch(`${isProduction}/video_info`, {

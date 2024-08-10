@@ -1,6 +1,7 @@
 const express = require("express");
 const compression = require("compression");
 const ytdl = require("@distube/ytdl-core");
+const path = require("path");
 const fs = require("fs");
 const app = express();
 const cors = require("cors");
@@ -36,10 +37,6 @@ const cookiesArray = [
     id: 11,
   },
 ];
-// const cookies = cookiesArray.map((cookie) => ({
-//   name: cookie.name,
-//   value: cookie.value,
-// }));
 
 const agent = ytdl.createProxyAgent({ uri: proxy }, cookiesArray);
 // const agent = ytdl.createAgent(cookiesArray);
@@ -62,54 +59,12 @@ io.on("connection", (socket) => {
   console.log("App connected");
   socket.on("disconnect", () => {
     console.log("App disconnected");
+    socket.removeAllListeners();
   });
 });
 
 // Method to pass video url and resolution to downloadVideo function
-async function downloadVideo(res, url, socketId) {
-  // const ytDownload = ytdl(url, {
-  //   filter: (format) => format.hasAudio ,
-
-  //   // filter: (format) => {
-  //   //   if (formatType === "video") {
-  //   //     return format.hasVideo;
-  //   //   } else {
-  //   //     return format.hasAudio;
-  //   //   }
-  //   // },
-
-  //   requestOptions: {
-  //     headers: {
-  //       "User-Agent":
-  //         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-  //       "Accept-Language": "en-US,en;q=0.8",
-  //     },
-  //   },
-  // });
-
-  // ytDownload
-  //   .on("progress", (_, downloaded, total) => {
-  //     const percent = (downloaded / total) * 100;
-  //     if (socketId) {
-  //       io.to(socketId).emit("progress", { percent });
-  //     }
-  //   })
-  //   .pipe(res);
-
-  // ytDownload.on("end", () => {
-  //   res.status(200).end();
-  //   if (socketId) {
-  //     io.to(socketId).emit("progress", { percent: 100 });
-  //   }
-  // });
-
-  // ytDownload.on("error", (error) => {
-  //   console.error("Failed to download YT video:", error);
-  //   res.status(500).json({ error: `${error}` });
-  //   if (socketId) {
-  //     io.to(socketId).emit("progress", { error: error.message });
-  //   }
-  // });
+async function downloadVideo(res, url, socketId, formatType, quality) {
   const info = await ytdl.getInfo(url, {
     agent: agent,
     requestOptions: {
@@ -122,9 +77,21 @@ async function downloadVideo(res, url, socketId) {
   });
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
+  const bestFormat = ytdl.chooseFormat(info.formats, {
+    // quality: "highest",
+    filter: (format) => {
+      if (formatType === "webm" || formatType === "mp4") {
+        return (
+          format?.container === formatType && format.qualityLabel === quality
+        );
+      }
+ 
+    },
+  });
+
   const videoStream = ytdl(url, {
-    quality: "highestvideo",
-    agent: agent,
+    format: bestFormat,
+    // agent: agent,
     requestOptions: {
       headers: {
         "User-Agent":
@@ -135,7 +102,7 @@ async function downloadVideo(res, url, socketId) {
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
-    agent: agent,
+    // agent: agent,
     requestOptions: {
       headers: {
         "User-Agent":
@@ -260,20 +227,113 @@ async function downloadVideo(res, url, socketId) {
   audioStream.pipe(ffmpegProcess.stdio[5]);
 }
 
+// FormatType is mp4 or webm
+// quality is 144p, 240p, 360p, 480p, 720p, 1080p
+async function downloadBasicWay(res, url, socketId, formatType, quality) {
+  const info = await ytdl.getInfo(url);
+  const bestFormat = ytdl.chooseFormat(info.formats, {
+    quality: formatType === "mp3" ? "highestaudio" : "highest",
+    filter: (format) => {
+      if (formatType === "mp3") {
+        return format?.hasAudio && !format.hasVideo;
+      }
+      return (
+        format?.container === formatType && format.qualityLabel === quality
+      );
+    },
+  });
+
+  const ytDownload = ytdl(url, {
+    format: bestFormat,
+    agent: agent,
+
+    requestOptions: {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+        "Accept-Language": "en-US,en;q=0.8",
+      },
+    },
+  });
+
+  ytDownload
+    .on("progress", (_, downloaded, total) => {
+      const percent = (downloaded / total) * 100;
+      if (socketId) {
+        io.to(socketId).emit("progress", { percent });
+      }
+    })
+    .pipe(res);
+
+  ytDownload.on("end", () => {
+    res.status(200).end();
+    if (socketId) {
+      io.to(socketId).emit("progress", { percent: 100 });
+    }
+    cleanUpTemporaryFiles();
+  });
+
+  ytDownload.on("error", (error) => {
+    console.error("Failed to download YT video:", error);
+    res.status(500).json({ error: `${error}` });
+    if (socketId) {
+      io.to(socketId).emit("progress", { error: error.message });
+    }
+    cleanUpTemporaryFiles();
+  });
+}
+// Function to clean up html file when video is downloaded
+function cleanUpTemporaryFiles() {
+  // Assuming all temporary files follow a specific pattern
+  const tempFilePattern = /^.*-watch\.html$/;
+  const directory = __dirname;
+
+  fs.readdir(directory, (err, files) => {
+    if (err) {
+      console.error("Error reading directory:", err);
+      return;
+    }
+
+    files.forEach((file) => {
+      if (tempFilePattern.test(file)) {
+        const filePath = path.join(directory, file);
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error(`Failed to delete file ${file}:`, err);
+          } else {
+            console.log(`File ${file} deleted`);
+          }
+        });
+      }
+    });
+  });
+}
 // Method to get video information
-async function getVideoInfo(url) {
+async function getVideoInfo(url, formatType, quality) {
   try {
     const info = await ytdl.getInfo(url, {
-      agent: agent,
-      requestOptions: {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-          "Accept-Language": "en-US,en;q=0.8",
-        },
-      },
+      // agent: agent,
+      // requestOptions: {
+      //   headers: {
+      //     "User-Agent":
+      //       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+      //     "Accept-Language": "en-US,en;q=0.8",
+      //   },
+      // },
     });
 
+    const bestFormat = ytdl.chooseFormat(info.formats, {
+      quality: formatType === "mp3" ? "highestaudio" : "highest",
+      filter: (format) => {
+        if (formatType === "mp3") {
+          return format?.hasAudio && !format.hasVideo;
+        }
+
+        return (
+          format?.container === formatType && format.qualityLabel === quality
+        );
+      },
+    });
     const videoThumbnail = info.videoDetails.thumbnails.filter(
       (item) => item.height === 1080
     );
@@ -286,7 +346,10 @@ async function getVideoInfo(url) {
       description: info.videoDetails.description,
       publish_date: info.videoDetails.publishDate,
       url,
+      format: bestFormat,
+      // info.formats.filter((format) => format.container === "mp4" ),
     };
+    cleanUpTemporaryFiles();
     return [videoInfo, null];
   } catch (error) {
     return [null, error.message];
@@ -303,7 +366,7 @@ function isValidYouTubeUrl(url) {
 // Path to post request to download video with resolution
 app.post("/download", async (req, res) => {
   res.setHeader("Content-Disposition", contentDisposition(`video.mp4`));
-  const { url, quality, socketId } = req.body;
+  const { url, quality, socketId, formatType } = req.body;
 
   if (!url) {
     return res
@@ -316,7 +379,11 @@ app.post("/download", async (req, res) => {
   }
 
   try {
-    await downloadVideo(res, url, socketId);
+    // console.log("Downloading video...:", formatType, quality);
+    if (formatType === "mp3") {
+      await downloadBasicWay(res, url, socketId, formatType, quality);
+    }
+    await downloadVideo(res, url, socketId, formatType, quality);
   } catch (error) {
     console.error("Failed to download video:", error);
     return res
@@ -327,7 +394,7 @@ app.post("/download", async (req, res) => {
 
 // Post Request to get video information
 app.post("/video_info", async (req, res) => {
-  const { url } = req.body;
+  const { url, formatType, quality } = req.body;
 
   if (!url) {
     return res
@@ -339,10 +406,13 @@ app.post("/video_info", async (req, res) => {
     return res.status(400).json({ error: "Invalid YouTube URL." });
   }
 
-  const [videoInfo, errorMessage] = await getVideoInfo(url);
+  const [videoInfo, errorMessage] = await getVideoInfo(
+    url,
+    formatType,
+    quality
+  );
 
   if (videoInfo) {
-    // const filterFormat = formats.filter((item) => item.hasAudio && item.hasVideo);
     return res.status(200).json(videoInfo);
   } else {
     return res.status(500).json({ error: errorMessage });

@@ -1,17 +1,27 @@
 /* eslint-disable prettier/prettier */
 "use client";
 import React, { useEffect, useState } from "react";
-import { Button, Card, CardBody, Image, Progress } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  Chip,
+  Image,
+  Progress,
+} from "@nextui-org/react";
 import moment from "moment";
-import { NextResponse } from "next/server";
+
 import { DownloadVideo, isProduction } from "@/scripts/youtube-downloader";
 import { io, Socket } from "socket.io-client";
 import DefaultEventsMap from "socket.io-client";
+import { RootState } from "@/reducers/store";
+import { useSelector } from "react-redux";
 
 interface DownloadDataProps {
   url: string;
   socketId: string | number | undefined;
   formatType: string;
+  quality: string;
 }
 export function YtCardDownload({ result }: any) {
   const [value, setValue] = useState(0);
@@ -41,21 +51,37 @@ export function YtCardDownload({ result }: any) {
   const duration = moment.duration(length, "seconds");
   const hours = duration.hours();
   const minutes = duration.minutes();
+  const selectedKeys = useSelector(
+    (state: RootState) => state.dropDown.selectedKeys
+  );
+
+  const selectedValue = React.useMemo(
+    () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
+    [selectedKeys]
+  );
+
+  const selectedQuality = useSelector(
+    (state: RootState) => state.dropDown.selectedQuality
+  );
+
+  const selectedQualityValue = React.useMemo(
+    () => Array.from(selectedQuality).join(", ").replaceAll("_", " "),
+    [selectedQuality]
+  );
 
   const downloadVideo = async () => {
     if (!socket || !socket.connected) {
       console.error("Socket is not initialized or connected");
       throw new Error("Invalid socket ID");
     }
-    // if (typeof socket.id !== "number") {
-    //   throw new Error("Invalid socket ID");
-    // }
 
     const downloadData: DownloadDataProps = {
       url: url,
       socketId: socket.id,
-      formatType: "video",
+      formatType: selectedValue,
+      quality: selectedQualityValue,
     };
+
     try {
       const res = await DownloadVideo(downloadData);
       console.log(res);
@@ -65,7 +91,7 @@ export function YtCardDownload({ result }: any) {
         const a = document.createElement("a");
         a.style.display = "none";
         a.href = downloadUrl;
-        a.download = `${title}.mp4`;
+        a.download = `${title}.${selectedValue}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(downloadUrl);
@@ -103,11 +129,17 @@ export function YtCardDownload({ result }: any) {
               </div>
             </div>
 
-            <div className="flex flex-col mt-3 gap-1">
+            <div className="flex flex-col mt-3 gap-1 ">
               <div className="flex justify-between">
                 <h1 className="text-default-600 text-sm">URL: {url}</h1>
+                {/* {console.log(result?.format?.qualityLabel ?? "Unknown")} */}
+                {result?.format && (
+                  <Chip color="secondary" variant="shadow">
+                    {result?.format?.qualityLabel ?? result?.format?.codecs}
+                  </Chip>
+                )}
 
-                <h3 className="text-default-600 text-sm">
+                <h3 className="text-default-600 text-sm ">
                   Duration: {`${hours}h ${minutes}m`}
                 </h3>
               </div>
@@ -136,8 +168,7 @@ export function YtCardDownload({ result }: any) {
                 color="secondary"
                 size="lg"
                 onClick={downloadVideo}
-                disabled={value?.toFixed(0) === "99"}
-                isDisabled={value?.toFixed(0) === "99"}
+                isDisabled={value >= 95}
               >
                 Download
               </Button>
