@@ -7,7 +7,7 @@ interface DownloadVideoProps {
   socketId: string;
 }
 export const isProduction =
-  process.env.NODE_ENV === "development"
+  process.env.NEXT_PUBLIC_ENV === "production"
     ? process.env.NEXT_PUBLIC_YT_API
     : "http://localhost:3001";
 export async function GetVideoInfo(downloadData: { url: string }) {
