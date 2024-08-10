@@ -234,7 +234,7 @@ async function downloadBasicWay(res, url, socketId, formatType, quality) {
     // quality: "highest",
     filter: (format) => {
       if (formatType === "mp3") {
-        return format?.hasAudio && !format.hasVideo;
+        return format?.mimeType.match(/audio/) && format.hasAudio;
       }
       // return (
       //   format?.container === formatType && format.qualityLabel === quality

@@ -84,7 +84,6 @@ export function YtCardDownload({ result }: any) {
 
     try {
       const res = await DownloadVideo(downloadData);
-      console.log(res);
       if (res.ok) {
         const blob = await res.blob();
         const downloadUrl = window.URL.createObjectURL(blob);
@@ -129,12 +128,12 @@ export function YtCardDownload({ result }: any) {
               </div>
             </div>
 
-            <div className="flex flex-col mt-3 gap-1 ">
-              <div className="flex justify-between">
+            <div className="flex flex-col my-3  ">
+              <div className="flex justify-between gap-[20px]  flex-wrap">
                 <h1 className="text-default-600 text-sm">URL: {url}</h1>
                 {/* {console.log(result?.format?.qualityLabel ?? "Unknown")} */}
                 {result?.format && (
-                  <Chip color="secondary" variant="shadow">
+                  <Chip color="secondary" variant="shadow" size="lg">
                     {result?.format?.qualityLabel ?? result?.format?.codecs}
                   </Chip>
                 )}
@@ -168,7 +167,7 @@ export function YtCardDownload({ result }: any) {
                 color="secondary"
                 size="lg"
                 onClick={downloadVideo}
-                isDisabled={value >= 95}
+                isDisabled={value >= 10}
               >
                 Download
               </Button>
