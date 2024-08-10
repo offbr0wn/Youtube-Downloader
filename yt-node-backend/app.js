@@ -231,7 +231,7 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
 async function downloadBasicWay(res, url, socketId, formatType, quality) {
   const info = await ytdl.getInfo(url, { agent: agent });
   const bestFormat = ytdl.chooseFormat(info.formats, {
-    quality: "highest",
+    // quality: "highest",
     filter: (format) => {
       if (formatType === "mp3") {
         return format?.hasAudio && !format.hasVideo;
