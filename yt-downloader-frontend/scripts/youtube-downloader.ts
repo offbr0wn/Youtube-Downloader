@@ -6,11 +6,12 @@ interface DownloadVideoProps {
   url: string;
   socketId: string;
 }
-export const isProduction = process.env.NEXT_PUBLIC_ENV;
-// === "production"
-// ?
-process.env.NEXT_PUBLIC_YT_API;
-// : "http://localhost:3001";
+
+export const isProduction =
+  process.env.NEXT_PUBLIC_ENV === "production"
+    ? process.env.NEXT_PUBLIC_YT_API
+    : "http://localhost:3001";
+
 export async function GetVideoInfo(downloadData: { url: string }) {
   const resBody = JSON.stringify(downloadData);
 
