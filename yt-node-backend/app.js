@@ -312,7 +312,7 @@ function cleanUpTemporaryFiles() {
 async function getVideoInfo(url, formatType, quality) {
   try {
     const info = await ytdl.getInfo(url, {
-      // agent: agent,
+      agent: agent,
       // requestOptions: {
       //   headers: {
       //     "User-Agent":
