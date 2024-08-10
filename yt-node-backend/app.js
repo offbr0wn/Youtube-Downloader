@@ -67,18 +67,11 @@ io.on("connection", (socket) => {
 async function downloadVideo(res, url, socketId, formatType, quality) {
   const info = await ytdl.getInfo(url, {
     agent: agent,
-    // requestOptions: {
-    //   headers: {
-    //     "User-Agent":
-    //       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-    //     "Accept-Language": "en-US,en;q=0.8",
-    //   },
-    // },
   });
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
   const bestFormat = ytdl.chooseFormat(info.formats, {
-    // quality: "highest",
+    quality: "highest",
     filter: (format) => {
       if (formatType === "webm" || formatType === "mp4") {
         return (
@@ -91,24 +84,10 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
   const videoStream = ytdl(url, {
     format: bestFormat,
     agent: agent,
-    // requestOptions: {
-    //   headers: {
-    //     "User-Agent":
-    //       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-    //     "Accept-Language": "en-US,en;q=0.8",
-    //   },
-    // },
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
     agent: agent,
-    // requestOptions: {
-    //   headers: {
-    //     "User-Agent":
-    //       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-    //     "Accept-Language": "en-US,en;q=0.8",
-    //   },
-    // },
   });
 
   // Create a temporary output file path
@@ -231,10 +210,10 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
 async function downloadBasicWay(res, url, socketId, formatType, quality) {
   const info = await ytdl.getInfo(url, { agent: agent });
   const bestFormat = ytdl.chooseFormat(info.formats, {
-    // quality: "highest",
+    // quality: "",
     filter: (format) => {
       if (formatType === "mp3") {
-        return format?.mimeType.match(/audio/) && format.hasAudio;
+        return format?.mimeType?.match(/audio/);
       }
       // return (
       //   format?.container === formatType && format.qualityLabel === quality
@@ -245,14 +224,6 @@ async function downloadBasicWay(res, url, socketId, formatType, quality) {
   const ytDownload = ytdl(url, {
     format: bestFormat,
     agent: agent,
-
-    // requestOptions: {
-    //   headers: {
-    //     "User-Agent":
-    //       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-    //     "Accept-Language": "en-US,en;q=0.8",
-    //   },
-    // },
   });
 
   ytDownload
@@ -312,20 +283,13 @@ async function getVideoInfo(url, formatType, quality) {
   try {
     const info = await ytdl.getInfo(url, {
       agent: agent,
-      // requestOptions: {
-      //   headers: {
-      //     "User-Agent":
-      //       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-      //     "Accept-Language": "en-US,en;q=0.8",
-      //   },
-      // },
     });
 
     const bestFormat = ytdl.chooseFormat(info.formats, {
       quality: formatType === "mp3" ? "highestaudio" : "highest",
       filter: (format) => {
         if (formatType === "mp3") {
-          return format?.hasAudio && !format.hasVideo;
+          return format.hasAudio && format.mimeType?.match(/audio/);
         }
 
         return (
@@ -381,8 +345,9 @@ app.post("/download", async (req, res) => {
     // console.log("Downloading video...:", formatType, quality);
     if (formatType === "mp3") {
       await downloadBasicWay(res, url, socketId, formatType, quality);
+    } else {
+      await downloadVideo(res, url, socketId, formatType, quality);
     }
-    await downloadVideo(res, url, socketId, formatType, quality);
   } catch (error) {
     console.error("Failed to download video:", error);
     return res
