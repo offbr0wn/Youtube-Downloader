@@ -70,7 +70,7 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
   const bestFormat = ytdl.chooseFormat(info.formats, {
-    quality: "highest",
+    quality: "highestvideo",
     filter: (format) => {
       if (formatType === "webm" || formatType === "mp4") {
         return (
