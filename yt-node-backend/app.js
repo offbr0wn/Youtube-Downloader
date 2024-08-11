@@ -282,7 +282,7 @@ async function getVideoInfo(url, formatType, quality) {
     });
 
     const bestFormat = ytdl.chooseFormat(info.formats, {
-      quality: formatType === "mp3" ? "highestaudio" : "highest",
+      quality: formatType === "mp3" ? "highestaudio" : null,
       filter: (format) => {
         if (formatType === "mp3") {
           return format.hasAudio && format.mimeType?.match(/audio/);
