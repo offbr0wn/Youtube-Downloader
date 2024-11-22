@@ -18,7 +18,8 @@ require("dotenv").config();
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = process.env.PORT || 3001;
-const proxy = process.env.PROXY_IP;
+const proxy = process.env.PROXY_IP
+
 const cookiesArray = [
   {
     domain: ".youtube.com",
@@ -49,7 +50,10 @@ app.use(compression());
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin:
+      process.env.NODE_ENV !== "development"
+        ? process.env.FRONTEND_URL
+        : "http://localhost:3000",
     methods: ["*"],
   },
 });
@@ -65,7 +69,7 @@ io.on("connection", (socket) => {
 // Method to pass video url and resolution to downloadVideo function
 async function downloadVideo(res, url, socketId, formatType, quality) {
   const info = await ytdl.getInfo(url, {
-    agent: agent,
+    // agent: agent,
   });
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
@@ -82,11 +86,11 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
 
   const videoStream = ytdl(url, {
     format: bestFormat,
-    agent: agent,
+    // agent: agent,
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
-    agent: agent,
+    // agent: agent,
   });
 
   // Create a temporary output file path
@@ -278,7 +282,7 @@ function cleanUpTemporaryFiles() {
 async function getVideoInfo(url, formatType, quality) {
   try {
     const info = await ytdl.getInfo(url, {
-      agent: agent,
+      // agent: agent,
     });
 
     const bestFormat = ytdl.chooseFormat(info.formats, {
