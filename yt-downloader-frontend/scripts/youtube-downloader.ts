@@ -12,7 +12,6 @@ export const isProduction =
     ? process.env.NEXT_PUBLIC_YT_API
     : "http://localhost:3001";
 
-console.log(isProduction);
 export async function GetVideoInfo(downloadData: { url: string }) {
   const resBody = JSON.stringify(downloadData);
 
