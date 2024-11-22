@@ -8,7 +8,7 @@ interface DownloadVideoProps {
 }
 
 export const isProduction =
-  process.env.NEXT_PUBLIC_ENV === "production"
+  process.env.NODE_ENV === "production"
     ? process.env.NEXT_PUBLIC_YT_API
     : "http://localhost:3001";
 
