@@ -39,8 +39,6 @@ const cookiesArray = [
 ];
 
 const agent = ytdl.createProxyAgent({ uri: proxy }, cookiesArray);
-// const agent = ytdl.createAgent(cookiesArray);
-// const agent = new HttpsProxyAgent(proxy);
 
 // app.use(bodyParser.json());
 app.use(express.json());
@@ -86,11 +84,11 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
 
   const videoStream = ytdl(url, {
     format: bestFormat,
-    // agent: agent,
+    agent: agent,
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
-    // agent: agent,
+    agent: agent,
   });
 
   // Create a temporary output file path
@@ -282,7 +280,7 @@ function cleanUpTemporaryFiles() {
 async function getVideoInfo(url, formatType, quality) {
   try {
     const info = await ytdl.getInfo(url, {
-      // agent: agent,
+      agent: agent,
     });
 
     const bestFormat = ytdl.chooseFormat(info.formats, {
@@ -310,7 +308,6 @@ async function getVideoInfo(url, formatType, quality) {
       publish_date: info.videoDetails.publishDate,
       url,
       format: bestFormat,
-      // info.formats.filter((format) => format.container === "mp4" ),
     };
     cleanUpTemporaryFiles();
     return [videoInfo, null];
