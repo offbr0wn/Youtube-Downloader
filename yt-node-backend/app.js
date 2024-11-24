@@ -18,7 +18,7 @@ require("dotenv").config();
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 const port = process.env.PORT || 3001;
-const proxy = process.env.PROXY_IP
+const proxy = process.env.PROXY_IP;
 
 const cookiesArray = [
   {
@@ -38,7 +38,7 @@ const cookiesArray = [
   },
 ];
 
-const agent = ytdl.createProxyAgent({ uri: proxy }, cookiesArray);
+const agent = ytdl.createAgent(cookiesArray);
 
 // app.use(bodyParser.json());
 app.use(express.json());
@@ -67,7 +67,7 @@ io.on("connection", (socket) => {
 // Method to pass video url and resolution to downloadVideo function
 async function downloadVideo(res, url, socketId, formatType, quality) {
   const info = await ytdl.getInfo(url, {
-    // agent: agent,
+    agent,
   });
   const duration = info.videoDetails.lengthSeconds; // Duration in seconds
 
@@ -84,11 +84,11 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
 
   const videoStream = ytdl(url, {
     format: bestFormat,
-    // agent: agent,
+    agent,
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
-    // agent: agent,
+    agent,
   });
 
   // Create a temporary output file path
@@ -209,7 +209,7 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
 // FormatType is mp4 or webm
 // quality is 144p, 240p, 360p, 480p, 720p, 1080p
 async function downloadBasicWay(res, url, socketId, formatType, quality) {
-  const info = await ytdl.getInfo(url, { agent: agent });
+  const info = await ytdl.getInfo(url, { agent });
   const bestFormat = ytdl.chooseFormat(info.formats, {
     // quality: "",
     filter: (format) => {
@@ -221,7 +221,7 @@ async function downloadBasicWay(res, url, socketId, formatType, quality) {
 
   const ytDownload = ytdl(url, {
     format: bestFormat,
-    // agent: agent,
+    agent,
   });
 
   ytDownload
@@ -280,7 +280,7 @@ function cleanUpTemporaryFiles() {
 async function getVideoInfo(url, formatType, quality) {
   try {
     const info = await ytdl.getInfo(url, {
-      // agent: agent,
+      agent,
     });
 
     const bestFormat = ytdl.chooseFormat(info.formats, {
