@@ -84,11 +84,11 @@ async function downloadVideo(res, url, socketId, formatType, quality) {
 
   const videoStream = ytdl(url, {
     format: bestFormat,
-    agent: agent,
+    // agent: agent,
   });
   const audioStream = ytdl(url, {
     quality: "highestaudio",
-    agent: agent,
+    // agent: agent,
   });
 
   // Create a temporary output file path
@@ -221,7 +221,7 @@ async function downloadBasicWay(res, url, socketId, formatType, quality) {
 
   const ytDownload = ytdl(url, {
     format: bestFormat,
-    agent: agent,
+    // agent: agent,
   });
 
   ytDownload
@@ -280,7 +280,7 @@ function cleanUpTemporaryFiles() {
 async function getVideoInfo(url, formatType, quality) {
   try {
     const info = await ytdl.getInfo(url, {
-      agent: agent,
+      // agent: agent,
     });
 
     const bestFormat = ytdl.chooseFormat(info.formats, {
