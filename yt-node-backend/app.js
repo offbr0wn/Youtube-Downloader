@@ -38,7 +38,7 @@ const cookiesArray = [
   },
 ];
 
-const agent = ytdl.createAgent(cookiesArray);
+const agent = ytdl.createProxyAgent({ uri: proxy }, cookiesArray);
 
 // app.use(bodyParser.json());
 app.use(express.json());
