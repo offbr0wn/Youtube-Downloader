@@ -6,11 +6,7 @@ const fs = require("fs");
 const app = express();
 const cors = require("cors");
 const http = require("http");
-const server = http.createServer(app, {
-  cors: {
-    origin: "*",
-  },
-});
+const server = http.createServer(app);
 const { Server } = require("socket.io");
 const helmet = require("helmet");
 const contentDisposition = require("content-disposition");
@@ -38,7 +34,7 @@ app.use(compression());
 const io = new Server(server, {
   cors: {
     origin:
-      process.env.NODE_ENV !== "development"
+      process.env.NODE_ENV === "production"
         ? process.env.FRONTEND_URL
         : "http://localhost:3000",
   },
