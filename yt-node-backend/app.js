@@ -6,7 +6,11 @@ const fs = require("fs");
 const app = express();
 const cors = require("cors");
 const http = require("http");
-const server = http.createServer(app);
+const server = http.createServer(app, {
+  cors: {
+    origin: "*",
+  },
+});
 const { Server } = require("socket.io");
 const helmet = require("helmet");
 const contentDisposition = require("content-disposition");
@@ -52,10 +56,8 @@ const io = new Server(server, {
       process.env.NODE_ENV !== "development"
         ? process.env.FRONTEND_URL
         : "http://localhost:3000",
-    methods: ["*"],
   },
 });
-io.origins("*:*");
 
 io.on("connection", (socket) => {
   console.log("App connected");
