@@ -55,6 +55,7 @@ const io = new Server(server, {
     methods: ["*"],
   },
 });
+io.origins("*:*");
 
 io.on("connection", (socket) => {
   console.log("App connected");
