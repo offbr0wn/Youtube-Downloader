@@ -24,25 +24,10 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 const port = process.env.PORT || 3001;
 const proxy = process.env.PROXY_IP;
 
-const cookiesArray = [
-  {
-    domain: ".youtube.com",
-    expirationDate: 1738609706.158883,
-    hostOnly: false,
-    httpOnly: true,
-    name: "LOGIN_INFO",
-    path: "/",
-    sameSite: "no_restriction",
-    secure: true,
-    session: false,
-    storeId: "0",
-    value:
-      "AFmmF2swRQIhANzgqj3jKZbgJ-0Lug6Cnm1xT82feksFpaKHB8AgUJRoAiBT0Tl0MvnvqKAvvYEVsr-3SV_sPf75yFz4VhT6csgIdA:QUQ3MjNmejRNVVpYUFlOSi1yR2xwM1h3cjhKS2FUcUJBNFg2REtRT2t6bjlUaHhTM0xTRjloc3lXRy1sUnpWdE9HcGtiTW5KSS1DUU0yd083aVlkOTNWZmhyUDNLcWdQc0xHbU83SXVPcEpyUmg4Snh1SkpXckFpeV9GSU16OHk0QkJTVTVRSEFuRHZXTUh0QndadFdGREVXNFJFVDVvbTBTVElfYUkwSUU4MWVMN0VDaHNkUXduOVJDZk16dUxDeEdUSnhBX256ZDYtLVEwRy1Wdzc0VE4wS3pNQWlRcEMzdw==",
-    id: 11,
-  },
-];
-
-const agent = ytdl.createAgent(cookiesArray);
+const agent = ytdl.createProxyAgent(
+  { uri: proxy },
+  JSON.parse(fs.readFileSync("cookies.json"))
+);
 
 // app.use(bodyParser.json());
 app.use(express.json());
