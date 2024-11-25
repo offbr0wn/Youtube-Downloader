@@ -25,7 +25,7 @@ const port = process.env.PORT || 3001;
 const proxy = process.env.PROXY_IP;
 
 const agent = ytdl.createProxyAgent(
-  { uri: proxy },
+  { uri: `http://szkvlcwz:53bony2kwsjb@${proxy}` },
   JSON.parse(fs.readFileSync("cookies.json"))
 );
 
