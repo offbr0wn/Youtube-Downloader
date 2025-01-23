@@ -1,0 +1,40 @@
+version: "3"
+services:
+  backend:
+    image: yt-backend
+    build:
+      context: ./yt-node-backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    develop:
+      watch:
+        - action: sync
+          path: .      
+          target: /yt-node-backend
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+    volumes:
+      - .:/usr/src/yt-node-frontend/app
+    
+      
+  frontend:
+    image: yt-frontend
+    build:
+      context: ./yt-downloader-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /yt-downloader-frontend
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+    volumes:
+      - .:/usr/src/yt-downloader-frontend/app

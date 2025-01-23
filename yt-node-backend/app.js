@@ -362,13 +362,13 @@ app.post("/video_info", async (req, res) => {
 
   if (videoInfo) {
     return res.status(200).json(videoInfo);
-  } else {
+  } else { 
     return res.status(500).json({ error: errorMessage });
   }
 });
 
 app.get("/", (req, res) => {
-  res.send("Welcome to the YouTube Downloader API");
+  res.send("Welcome to the YouTube Downloader API!");
 });
 
 // Error handling middleware

@@ -23,7 +23,6 @@
     "fluent-ffmpeg": "^2.1.3",
     "helmet": "^7.1.0",
     "https-proxy-agent": "^7.0.5",
-    "nayan-media-downloader": "^2.0.3",
     "socket.io": "^4.8.0",
     "socket.io-client": "^4.7.5",
     "videos-downloader": "^1.0.2",
